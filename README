@@ -1,0 +1,56 @@
+
+ninjastorms toolchain generator
+===============================
+
+This project provides a generator for cross compile toolchains for ninjastorms
+compilation. The toolchains include binutils, gcc and optionally gdb for
+debugging.
+
+Example Invocation:
+  $> TARGET=i686-elf ./toolchain-generator.sh
+
+Influential environment variables:
+----------------------------------
+
+The generated toolchain and the build process can be altered using by setting
+the following variables in the environment:
+
+  TARGET
+    configure the target triplet for the generated toolchain. Common examples
+    are: arm-none-eabi, i686-elf, x86_64-elf. Defaults to arm-none-eabi.
+
+  PREFIX
+    configure the install prefix of the generated toolchain. Defaults to
+    `/usr/local`.
+
+  MFLAGS
+    define additional flags to pass to `make` invocations, for example to
+    parallelize the builds.
+
+
+  BINUTILS_VERSION
+    the version of binutils to use. Defaults to 2.24
+
+  GCC_VERSION
+    the version of gcc to use. Defaults to 4.8.0
+
+  GMP_VERSION
+    the version of gmp to use. Defaults to 5.1.1
+
+  MPC_VERSION
+    the version of mpc to use. Defaults to 1.0.1
+
+  MPFR_VERSION
+    the version of mpfr to use. Defaults to 3.1.2
+
+  GDB_VERSION
+    the version of gdb to use. Set empty to exclude gdb from the generated
+    toolchain. Defaults to 7.6
+
+
+  TARDIR
+    configure the target directory for downloaded tarballs. Should probably
+    be left unchanged. Defaults to `sources/`.
+
+  BUILDROOT
+    configure the target directory for builds. Defaults to `/tmp`.

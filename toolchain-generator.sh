@@ -1,7 +1,7 @@
 #!/bin/sh
 
  ##############################################################################
- #       ninjastorms - shuriken operating system                              #
+ #       ninjastorms project toolchain generator                              #
  #                                                                            #
  #    Copyright (C) 2014 - 2016  Andreas Grapentin et al.                     #
  #                                                                            #
@@ -23,22 +23,22 @@ set -e
 set -u
 
 # toolchain parameters
-TARGET=${TARGET:-i686-elf}
+TARGET=${TARGET:-arm-none-eabi}
 MFLAGS=${MFLAGS:-}
 PREFIX=${PREFIX:-/usr/local}
 
 # used versions
+BINUTILS_VERSION=${BINUTILS_VERSION:-2.24}
 GCC_VERSION=${GCC_VERSION:-4.8.0}
 GMP_VERSION=${GMP_VERSION:-5.1.1}
 MPC_VERSION=${MPC_VERSION:-1.0.1}
 MPFR_VERSION=${MPFR_VERSION:-3.1.2}
 GDB_VERSION=${GDB_VERSION:-7.6}
-BINUTILS_VERSION=${BINUTILS_VERSION:-2.24}
 
 # directory config
 TARDIR=${TARDIR:-$(dirname $(readlink -f $0))/sources}
 PATCHDIR=$(dirname $(readlink -f $0))/patches
-BUILDROOT=${BUILDROOT:-/tmp/$(basename $0)}
+BUILDROOT=${BUILDROOT:-/tmp}
 SRCDIR=$BUILDROOT/src
 BUILDDIR=$BUILDROOT/build
 
@@ -57,12 +57,14 @@ fetch () {
   wget -nc -P $TARDIR --progress=dot:giga $1.gz
 }
 
+fetch http://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar
 fetch ftp://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar
 fetch ftp://ftp.gnu.org/gnu/gmp/gmp-$GMP_VERSION.tar
 fetch ftp://ftp.gnu.org/gnu/mpc/mpc-$MPC_VERSION.tar
 fetch http://www.mpfr.org/mpfr-$MPFR_VERSION/mpfr-$MPFR_VERSION.tar
-fetch ftp://ftp.gnu.org/gnu/gdb/gdb-$GDB_VERSION.tar
-fetch http://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar
+if [ -n "$GDB_VERSION" ]; then
+  fetch ftp://ftp.gnu.org/gnu/gdb/gdb-$GDB_VERSION.tar
+fi
 
 # unpack
 for f in $TARDIR/*.tar.*; do
@@ -94,13 +96,15 @@ make install-gcc
 make install-target-libgcc
 
 # build gdb
-patch -d $SRCDIR/gdb-$GDB_VERSION -p1 < $PATCHDIR/gdb-configure.patch
-mkdir -vp $BUILDDIR/gdb-$GDB_VERSION
-cd $BUILDDIR/gdb-$GDB_VERSION
-../../src/gdb-$GDB_VERSION/configure \
-    --target=$TARGET --prefix=$PREFIX --disable-nls --disable-werror
-make $MFLAGS all
-make install
+if [ -n "$GDB_VERSION" ]; then
+  patch -d $SRCDIR/gdb-$GDB_VERSION -p1 < $PATCHDIR/gdb-configure.patch
+  mkdir -vp $BUILDDIR/gdb-$GDB_VERSION
+  cd $BUILDDIR/gdb-$GDB_VERSION
+  ../../src/gdb-$GDB_VERSION/configure \
+      --target=$TARGET --prefix=$PREFIX --disable-nls --disable-werror
+  make $MFLAGS all
+  make install
+fi
 
 # cleanup
 rm -rf $BUILDDIR $SRCDIR
