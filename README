@@ -29,10 +29,10 @@ the following variables in the environment:
 
 
   BINUTILS_VERSION
-    the version of binutils to use. Defaults to 2.24
+    the version of binutils to use. Defaults to 2.25
 
   GCC_VERSION
-    the version of gcc to use. Defaults to 4.8.0
+    the version of gcc to use. Defaults to 4.9.2
 
   GMP_VERSION
     the version of gmp to use. Defaults to 5.1.1
